@@ -40,7 +40,6 @@ app.post('/api/users/:_id/exercises', (req, res) =>{
     date: dateObj.toDateString()
   };
 
-  console.log(exercise);
   const user = userRepository.getUserById(user_id);
   userRepository.addExerciseLog(user_id, exercise);
   res.json({
@@ -55,7 +54,6 @@ app.post('/api/users/:_id/exercises', (req, res) =>{
 app.get('/api/users/:_id/logs', (req, res) =>{
   console.log(req.params);
   user = userRepository.getUserById(req.params._id);
-  console.log(user)
   if (user) {
     res.json(user);
   } else {
