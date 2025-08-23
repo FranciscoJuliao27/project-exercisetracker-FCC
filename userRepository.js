@@ -14,8 +14,8 @@ function addNewUser(username) {
 
 function getAllUsers() {
     return Array.from(users.values()).map(user => ({
-        username: user.username,
-        _id: user._id
+        _id: user._id,
+        username: user.username
     }))
 };
 
