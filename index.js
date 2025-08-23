@@ -37,7 +37,7 @@ app.post('/api/users/:_id/exercises', (req, res) =>{
   const exercise = {
     description: req.body.description,
     duration: Number(req.body.duration),
-    date: dateObj.toDateString()
+    date: dateObj
   };
 
   const user = userRepository.getUserById(user_id);
@@ -45,20 +45,45 @@ app.post('/api/users/:_id/exercises', (req, res) =>{
   res.json({
     _id: user._id,
     username: user.username,
-    date: exercise.date,
+    date: exercise.date.toDateString(),
     duration: Number(exercise.duration),
     description: exercise.description
   }); 
 });
 
 app.get('/api/users/:_id/logs', (req, res) =>{
-  console.log(req.params);
-  user = userRepository.getUserById(req.params._id);
-  if (user) {
-    res.json(user);
-  } else {
-    res.status(404)
+  const user_id = req.params._id;
+  const user = userRepository.getUserById(user_id);
+  if (!user) {
+    return res.status(404)
   }
+
+  let { from, to, limit } = req.query;
+  let logs = user.log;
+
+  if (from) {
+    const fromDate = new Date(from);
+    logs = logs.filter(l => new Date(l.date) >= fromDate);
+  }
+  if (to) {
+    const toDate = new Date(to);
+    logs = logs.filter(l => new Date(l.date) <= toDate);
+  }
+  if (limit) {
+    logs = logs.slice(0, Number(limit));
+  }
+
+  const logsFormatados = logs.map(l => ({
+    ...l,
+    date: new Date(l.date).toDateString()
+  }));
+
+  res.json({
+    _id: user._id,
+    username: user.username,
+    count: logsFormatados.length,
+    log: logsFormatados
+  })
 });
 
 const listener = app.listen(process.env.PORT || 3000, () => {
